@@ -1,9 +1,8 @@
 //your JS code here.
-// your JS code here.
 
-const questionsElement = document.getElementById("questions");
-const submitButton = document.getElementById("submit");
-const scoreElement = document.getElementById("score");
+const questionsContainer = document.getElementById("questions");
+const submitBtn = document.getElementById("submit");
+const scoreDiv = document.getElementById("score");
 
 let userAnswers =
   JSON.parse(sessionStorage.getItem("progress")) ||
@@ -65,38 +64,28 @@ const questions = [
 
 // Display the quiz questions and choices
 function renderQuestions() {
-  questionsElement.innerHTML = "";
+  questionsContainer.innerHTML = "";
 
   for (let i = 0; i < questions.length; i++) {
-    const question = questions[i];
-    const questionElement = document.createElement("div");
+    const q = questions[i];
 
-    const questionText = document.createTextNode(question.question);
-    questionElement.appendChild(questionText);
+    const div = document.createElement("div");
 
-    for (let j = 0; j < question.choices.length; j++) {
-      const choice = question.choices[j];
+    div.appendChild(document.createTextNode(q.question));
 
-      const choiceElement = document.createElement("input");
-      choiceElement.setAttribute("type", "radio");
-      choiceElement.setAttribute("name", `question-${i}`);
-      choiceElement.setAttribute("value", choice);
+    for (let j = 0; j < q.choices.length; j++) {
+      const input = document.createElement("input");
 
-      if (userAnswers[i] === choice) {
-        choiceElement.checked = true;
-      }
+      input.type = "radio";
+      input.name = `question-${i}`;
+      input.value = q.choices[j];
 
-      choiceElement.addEventListener("change", function () {
-        userAnswers[i] = choice;
-        saveProgress();
-      });
+      const labelText = document.createTextNode(q.choices[j]);
 
-      const choiceText = document.createTextNode(choice);
-
-      questionElement.appendChild(choiceElement);
-      questionElement.appendChild(choiceText);
+      div.appendChild(input);
+      div.appendChild(labelText);
     }
 
-    questionsElement.appendChild(questionElement);
+    questionsContainer.appendChild(div);
   }
 }
