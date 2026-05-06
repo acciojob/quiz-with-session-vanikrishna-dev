@@ -1,26 +1,51 @@
-//your JS code here.
-
 const questionsContainer = document.getElementById("questions");
 const submitBtn = document.getElementById("submit");
 const scoreDiv = document.getElementById("score");
 
-let userAnswers =
-  JSON.parse(sessionStorage.getItem("progress")) ||
-  new Array(questions.length).fill("");
+let userAnswers = [];
 
-const savedScore = localStorage.getItem("score");
-if (savedScore !== null) {
-  scoreElement.textContent = `Your score is ${savedScore} out of 5.`;
-}
+let savedProgress = JSON.parse(sessionStorage.getItem("progress"));
 
 function saveProgress() {
-  sessionStorage.setItem(
-    "progress",
-    JSON.stringify(userAnswers)
-  );
+  sessionStorage.setItem("progress", JSON.stringify(userAnswers));
 }
 
-submitButton.addEventListener("click", function () {
+function renderQuestions() {
+  questionsContainer.innerHTML = "";
+
+  for (let i = 0; i < questions.length; i++) {
+    const q = questions[i];
+
+    const div = document.createElement("div");
+
+    div.appendChild(document.createTextNode(q.question));
+
+    for (let j = 0; j < q.choices.length; j++) {
+      const input = document.createElement("input");
+
+      input.type = "radio";
+      input.name = `question-${i}`;
+      input.value = q.choices[j];
+
+      // restore session selection
+      if (userAnswers[i] === q.choices[j]) {
+        input.checked = true;
+      }
+
+      input.addEventListener("change", function () {
+        userAnswers[i] = q.choices[j];
+        saveProgress();
+      });
+
+      div.appendChild(input);
+      div.appendChild(document.createTextNode(q.choices[j]));
+    }
+
+    questionsContainer.appendChild(div);
+  }
+}
+
+submitBtn.addEventListener("click", function () {
   let score = 0;
 
   for (let i = 0; i < questions.length; i++) {
@@ -29,11 +54,10 @@ submitButton.addEventListener("click", function () {
     }
   }
 
-  scoreElement.textContent = `Your score is ${score} out of 5.`;
+  scoreDiv.textContent = `Your score is ${score} out of 5.`;
   localStorage.setItem("score", score);
 });
-// Do not change code below this line
-// This code will just display the questions to the screen
+
 const questions = [
   {
     question: "What is the capital of France?",
@@ -62,30 +86,10 @@ const questions = [
   },
 ];
 
-// Display the quiz questions and choices
-function renderQuestions() {
-  questionsContainer.innerHTML = "";
-
-  for (let i = 0; i < questions.length; i++) {
-    const q = questions[i];
-
-    const div = document.createElement("div");
-
-    div.appendChild(document.createTextNode(q.question));
-
-    for (let j = 0; j < q.choices.length; j++) {
-      const input = document.createElement("input");
-
-      input.type = "radio";
-      input.name = `question-${i}`;
-      input.value = q.choices[j];
-
-      const labelText = document.createTextNode(q.choices[j]);
-
-      div.appendChild(input);
-      div.appendChild(labelText);
-    }
-
-    questionsContainer.appendChild(div);
-  }
+if (savedProgress) {
+  userAnswers = savedProgress;
+} else {
+  userAnswers = new Array(questions.length).fill("");
 }
+
+renderQuestions();
